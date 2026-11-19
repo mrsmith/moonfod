@@ -17,11 +17,15 @@ npm test
 
 ## Experience
 
-The Moon fills the view against a subtle star field. Side arrows move one day at a time. Today follows the clock; past and future dates use 21:00 in the browser's local timezone. A small caption identifies today's or a past day's discovery. Tap its name or geographic outline for the lesson and observing tip. Outlines are faint grey by default and brighten to gold when the boundary or feature name is hovered or focused. The terrain remains unfilled and unobscured. Future dates show the Moon without revealing a discovery.
+The Moon fills the view against a subtle star field. Side arrows move one day at a time; swipe left across the Moon for the next day and right for the previous day. Today follows the clock; past and future dates use 21:00 in the browser's local timezone. The caption reads “Today’s feature” or “Feature for [date]”; future dates say “Tomorrow’s Moon” or “Moon for [date]” and reveal no lesson.
+
+On touchscreens, tap the Moon, feature, or feature name to highlight the outline, then tap the highlighted feature or its name again to read the lesson. The two taps need not be rapid. Mouse hover and keyboard focus highlight the feature, with one click or Enter opening the lesson. Outlines are faint grey by default and brighten to gold, without filling or obscuring the terrain. The invisible hit area includes the feature interior and a wider boundary. Swipes ignore vertical movement, small drags, long holds, pinches, and pointer cancellation; a completed swipe cannot also click a lesson.
+
+The gutter has fixed rows for its caption, feature, and touch hint. “Back to today” occupies a reserved slot in the fixed footer between subtle About and GitHub links, so changing dates does not shift the gutter. About explains the purpose, controls, and sources. Its tooltip supports hover and keyboard focus, can be hovered itself, persists while in use, and dismisses with Escape. Main touch controls are at least 44 CSS pixels. The browser tab always starts with “Moon Feature of the Day.” The GitHub link targets `mrsmith/moonfod`, ready for repository publication.
 
 Brightness uses the preferred 40% viewing level with automatic phase compensation and no on-screen control. Exposure decreases toward full Moon, while shadow detail receives a stronger lift during dark phases. Smooth compensation curves are anchored to the preferred gibbous view. Phase and sunlight geometry stay unchanged.
 
-Left/right arrow keys navigate dates; Home returns to today. The interface supports keyboard focus, reduced motion, and small screens. The previous atlas, collection, timeline, and advanced rendering controls are no longer displayed.
+Left/right arrow keys navigate dates; Home returns to today. The interface supports keyboard focus, reduced motion, and small screens. Native dialogs manage lesson/About focus and Escape dismissal. Browser pinch zoom remains available; swipes have equivalent arrow buttons. The previous atlas, collection, timeline, and advanced rendering controls are no longer displayed.
 
 ## Rendering and astronomy
 

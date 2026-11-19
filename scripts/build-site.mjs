@@ -13,7 +13,7 @@ if (url.protocol !== 'https:' || !url.hostname.includes('.') || url.username || 
 }
 const origin = url.origin;
 const escape = text => String(text).replace(/[&<>"']/g, char => ({'&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'}[char]));
-const title = `${site.name} — Moon Feature of the Day`;
+const title = `Moon Feature of the Day — ${site.name}`;
 const description = 'Learn one Moon feature each day. Explore craters, lunar seas, and mountains on an interactive Moon with date-accurate phases, rotation, and feature outlines.';
 const schema = {
   '@context': 'https://schema.org',

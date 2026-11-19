@@ -2,5 +2,6 @@
 export const site = {
   "name": "MoonFOD",
   "slug": "moonfod",
-  "url": "https://moonfod.com"
+  "url": "https://moonfod.com",
+  "repositoryUrl": "https://github.com/mrsmith/moonfod"
 };

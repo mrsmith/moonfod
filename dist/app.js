@@ -5,8 +5,11 @@ import {discoveryForDate,isObservable} from './experience.js';
 import {outlines} from './outlines.js';
 import {projectOutline} from './outline-projection.js';
 import {site} from './site.js';
+import {createGestureTracker,featureActivation} from './gestures.js';
 const $=id=>document.getElementById(id);
 let selectedDate=new Date(),live=true,e,featured=null,renderer,pendingDraw=0;
+let selectedFeature=false,hoveredFeature=false,focusedFeature=false;
+const dialogs=()=>document.querySelector('dialog[open]');
 const view={zoom:1,south:false,brightness:40};
 const formatDate=d=>new Intl.DateTimeFormat(undefined,{day:'numeric',month:'long',...(d.getFullYear()!==new Date().getFullYear()?{year:'numeric'}:{})}).format(d);
 const coord=(v,p,n)=>`${Math.abs(v).toFixed(1)}° ${v>=0?p:n}`;
@@ -14,13 +17,16 @@ function relativeDay(date){const diff=dayNumber(date)-dayNumber(new Date());retu
 function adjacent(direction){const d=new Date(selectedDate);d.setDate(d.getDate()+direction);return d}
 function updateDate(date,{isLive=false}={}){
  if(!Number.isFinite(+date)||date.getFullYear()<1900||date.getFullYear()>2100)return;
+ const previousDiscovery=`${dayKey(selectedDate)}:${featured?.id}`;
  selectedDate=date;live=isLive;e=ephemeris(date);
  featured=discoveryForDate(date,new Date(),dailyFeature);
  if(featured&&!isObservable(featured,e))featured=null;
+ if(previousDiscovery!==`${dayKey(date)}:${featured?.id}`){hoveredFeature=false;focusedFeature=false;setFeatureSelected(false)}
  const relative=relativeDay(date),diff=dayNumber(date)-dayNumber(new Date());
- $('observation-date').textContent=Math.abs(diff)<=1?`${relative} · ${formatDate(date)}`:formatDate(date);
+ $('observation-date').textContent=diff===0?'Today’s feature':diff>0?(diff===1?'Tomorrow’s Moon':`Moon for ${formatDate(date)}`):`Feature for ${formatDate(date)}`;
+ $('observation-date').title=diff===0?`Moon Feature of the Day · ${formatDate(date)}`:`Moon Feature of the Day · ${relative}`;
  $('feature-name').hidden=!featured;$('feature-name').textContent=featured?.name||'';
- $('feature-name').setAttribute('aria-label',featured?`Discover ${featured.name}, ${relative.toLowerCase()}’s lunar feature`:'');
+ updateFeatureLabel();
  $('no-feature').hidden=!!featured||diff>0;
  $('no-feature').textContent=diff===0?'No feature in view today.':'No feature in view on this date.';
  $('return-today').hidden=diff===0;
@@ -29,7 +35,7 @@ function updateDate(date,{isLive=false}={}){
  $('next-day').setAttribute('aria-label',`View ${relativeDay(adjacent(1)).toLowerCase()}`);
  $('previous-day').disabled=dayKey(date)==='1900-01-01';$('next-day').disabled=dayKey(date)==='2100-12-31';
  $('moon').setAttribute('aria-label',`${phaseName(e)}, ${(e.illuminated*100).toFixed(1)} percent illuminated. ${formatDate(date)}. View from Earth, celestial north up.`);
- document.title=diff===0?`${site.name} — Moon Feature of the Day`:`${relative} on the Moon — ${site.name}`;
+ document.title=`Moon Feature of the Day — ${site.name}${diff===0?'':` · ${relative}`}`;
  scheduleDraw();
 }
 function scheduleDraw(){if(pendingDraw||document.hidden)return;pendingDraw=requestAnimationFrame(()=>{pendingDraw=0;draw()})}
@@ -41,9 +47,10 @@ function draw(){
  const path=projectOutline(shape.paths,e,g);if(!path){outline.hidden=true;return}
  $('outline-svg').setAttribute('viewBox',`0 0 ${g.width} ${g.height}`);
  $('outline-trace').setAttribute('d',path);$('outline-hit').setAttribute('d',path);
- outline.setAttribute('aria-label',`Explore ${featured.name}`);outline.hidden=false;
+ outline.hidden=false;
 }
 function stepDay(direction){
+ hideTooltip();
  const next=adjacent(direction);const isToday=dayKey(next)===dayKey(new Date());
  if(isToday)updateDate(new Date(),{isLive:true});else{next.setHours(21,0,0,0);updateDate(next)}
 }
@@ -51,6 +58,7 @@ $('previous-day').onclick=()=>stepDay(-1);$('next-day').onclick=()=>stepDay(1);
 $('return-today').onclick=()=>updateDate(new Date(),{isLive:true});
 function openDetail(){
  if(!featured)return;const f=featured;
+ hideTooltip();
  $('detail-date').textContent=dayKey(selectedDate)===dayKey(new Date())?'TODAY’S DISCOVERY':`DISCOVERED ${formatDate(selectedDate).toUpperCase()}`;
  $('detail-name').textContent=f.name;$('detail-subtitle').textContent=f.subtitle;
  $('detail-intro').textContent=f.intro;$('detail-lesson').textContent=f.lesson;$('detail-tip').textContent=f.tip;
@@ -58,13 +66,67 @@ function openDetail(){
  const p=project(f,e);$('detail-visibility').textContent=p.light<=0?'On the night side. Enhanced brightness reveals the surface for study.':p.light<.25?'Near the terminator, where low sunlight reveals the terrain.':'';
  $('detail-source').href=f.source;$('outline-source').href=outlines[f.id].source;$('detail-dialog').showModal();
 }
-$('feature-name').onclick=$('feature-outline').onclick=openDetail;
-for(const event of ['pointerenter','focus'])$('feature-name').addEventListener(event,()=>document.body.classList.add('feature-focus'));
-for(const event of ['pointerleave','blur'])$('feature-name').addEventListener(event,()=>document.body.classList.remove('feature-focus'));
+function updateFeatureLabel(){
+ const label=featured?`${selectedFeature?'Read about':'Explore'} ${featured.name}, ${dayKey(selectedDate)===dayKey(new Date())?'today’s feature':`feature for ${formatDate(selectedDate)}`}`:'';
+ $('feature-name').setAttribute('aria-label',label);$('feature-outline').setAttribute('aria-label',label);
+ $('tap-hint').textContent=selectedFeature&&featured?'Tap the feature again to read its story':'';
+}
+function renderFeatureFocus(){document.body.classList.toggle('feature-focus',selectedFeature||hoveredFeature||focusedFeature)}
+function setFeatureSelected(value){selectedFeature=value;renderFeatureFocus();updateFeatureLabel()}
+for(const id of ['feature-name','feature-outline']){
+ const button=$(id);
+ button.addEventListener('pointerenter',event=>{if(event.pointerType==='mouse'){hoveredFeature=true;renderFeatureFocus()}});
+ button.addEventListener('pointerleave',event=>{if(event.pointerType==='mouse'){hoveredFeature=false;renderFeatureFocus()}});
+ button.addEventListener('focus',()=>{focusedFeature=button.matches(':focus-visible');renderFeatureFocus()});
+ button.addEventListener('blur',()=>{focusedFeature=false;renderFeatureFocus()});
+ button.onclick=event=>{
+  const action=featureActivation({available:!!featured,selected:selectedFeature,pointerType:event.pointerType||lastPointerType,keyboard:event.detail===0});
+  if(action==='highlight')setFeatureSelected(true);else if(action==='open')openDetail();
+ };
+}
+const gestures=createGestureTracker();let suppressClickUntil=0,lastPointerType='mouse';
+document.addEventListener('pointerdown',event=>{
+ lastPointerType=event.pointerType;suppressClickUntil=0;
+ if(event.isPrimary===false){gestures.cancel();suppressClickUntil=performance.now()+700}
+ if(!event.target.closest('#moon-stage,#feature-name'))setFeatureSelected(false);
+ if(!event.target.closest('.about-wrap'))hideTooltip();
+},true);
+$('moon-stage').addEventListener('pointerdown',event=>{if(!dialogs())gestures.start(event)});
+window.addEventListener('pointermove',event=>gestures.move(event),{passive:true});
+window.addEventListener('pointerup',event=>{
+ const result=gestures.end(event);if(!result)return;
+ if(result.kind!=='tap')suppressClickUntil=performance.now()+700;
+ if(result.kind==='swipe'&&!dialogs())stepDay(result.direction);
+});
+window.addEventListener('pointercancel',()=>{gestures.cancel();suppressClickUntil=performance.now()+700});
+window.addEventListener('blur',()=>gestures.cancel());
+document.addEventListener('click',event=>{
+ if(event.detail>0&&performance.now()<suppressClickUntil){event.preventDefault();event.stopImmediatePropagation();suppressClickUntil=0}
+},true);
+$('moon').onclick=event=>{
+ if(!featured||dialogs()||!renderer?.geometry)return;
+ const r=$('moon').getBoundingClientRect(),g=renderer.geometry;
+ if(Math.hypot(event.clientX-r.left-g.cx,event.clientY-r.top-g.cy)<=g.radius)setFeatureSelected(true);
+ else setFeatureSelected(false);
+};
+$('feature-name').title='Locate this feature on the Moon, then read its story';
+$('feature-outline').setAttribute('aria-haspopup','dialog');
+let tooltipDismissed=false;
+function hideTooltip(dismiss=false){if(dismiss)tooltipDismissed=true;$('about-tooltip').hidden=true}
+const aboutWrap=$('about-link').parentElement;
+aboutWrap.addEventListener('pointerenter',event=>{if(event.pointerType==='mouse'&&!dialogs()&&!tooltipDismissed)$('about-tooltip').hidden=false});
+aboutWrap.addEventListener('pointerleave',()=>{if(!dialogs())tooltipDismissed=false;if(document.activeElement!==$('about-link'))hideTooltip()});
+$('about-link').addEventListener('focus',()=>{if($('about-link').matches(':focus-visible')&&!tooltipDismissed&&!dialogs())$('about-tooltip').hidden=false});
+$('about-link').addEventListener('blur',()=>{if(!dialogs())tooltipDismissed=false;hideTooltip()});
+$('about-link').onclick=event=>{event.preventDefault();hideTooltip(true);$('about-dialog').showModal()};
+$('close-about').onclick=()=>$('about-dialog').close();
+$('about-dialog').addEventListener('close',()=>hideTooltip(true));
+if(site.repositoryUrl){$('github-link').href=site.repositoryUrl;$('github-link').removeAttribute('aria-disabled');$('github-link').title='MoonFOD source code on GitHub'}
 $('close-detail').onclick=()=>$('detail-dialog').close();
-$('detail-dialog').addEventListener('click',event=>{if(event.target!==$('detail-dialog'))return;const r=event.target.getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)event.target.close()});
+for(const dialog of document.querySelectorAll('dialog'))dialog.addEventListener('click',event=>{if(event.target!==dialog)return;const r=dialog.getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)dialog.close()});
 document.addEventListener('keydown',event=>{
- if($('detail-dialog').open||event.target.matches('input,textarea,select,[contenteditable]')||event.altKey||event.ctrlKey||event.metaKey)return;
+ if(event.key==='Escape'){hideTooltip(true);setFeatureSelected(false)}
+ if(dialogs()||event.target.matches('input,textarea,select,[contenteditable]')||event.altKey||event.ctrlKey||event.metaKey)return;
  if(event.key==='ArrowLeft'){event.preventDefault();stepDay(-1)}
  if(event.key==='ArrowRight'){event.preventDefault();stepDay(1)}
  if(event.key==='Home'){event.preventDefault();updateDate(new Date(),{isLive:true})}
