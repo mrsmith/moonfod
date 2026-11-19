@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+ <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+ <meta name="theme-color" content="#020305">
+ <!-- site-metadata:start -->
+ <title>MoonFOD — Moon Feature of the Day</title>
+ <meta name="description" content="Learn one Moon feature each day. Explore craters, lunar seas, and mountains on an interactive Moon with date-accurate phases, rotation, and feature outlines.">
+ <meta name="application-name" content="MoonFOD">
+ <meta name="robots" content="index, follow, max-image-preview:large">
+ <link rel="canonical" href="https://moonfod.com/">
+ <meta property="og:type" content="website">
+ <meta property="og:locale" content="en_US">
+ <meta property="og:site_name" content="MoonFOD">
+ <meta property="og:title" content="MoonFOD — Moon Feature of the Day">
+ <meta property="og:description" content="Learn one Moon feature each day. Explore craters, lunar seas, and mountains on an interactive Moon with date-accurate phases, rotation, and feature outlines.">
+ <meta property="og:url" content="https://moonfod.com/">
+ <meta property="og:image" content="https://moonfod.com/assets/social-preview.jpg">
+ <meta property="og:image:width" content="1200">
+ <meta property="og:image:height" content="630">
+ <meta property="og:image:alt" content="A detailed Moon against a star field, with a daily lunar feature to explore.">
+ <meta name="twitter:card" content="summary_large_image">
+ <meta name="twitter:title" content="MoonFOD — Moon Feature of the Day">
+ <meta name="twitter:description" content="Learn one Moon feature each day. Explore craters, lunar seas, and mountains on an interactive Moon with date-accurate phases, rotation, and feature outlines.">
+ <meta name="twitter:image" content="https://moonfod.com/assets/social-preview.jpg">
+ <meta name="twitter:image:alt" content="A detailed Moon against a star field, with a daily lunar feature to explore.">
+ <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"MoonFOD","alternateName":"Moon Feature of the Day","url":"https://moonfod.com/","description":"Learn one Moon feature each day. Explore craters, lunar seas, and mountains on an interactive Moon with date-accurate phases, rotation, and feature outlines.","applicationCategory":"EducationalApplication","operatingSystem":"Any","browserRequirements":"JavaScript and WebGL","inLanguage":"en","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"image":"https://moonfod.com/assets/social-preview.jpg"}</script>
+ <!-- site-metadata:end -->
+ <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="./style.css">
+ <script src="./vendor/astronomy.js" defer></script><script src="./app.js" type="module"></script>
+</head>
+<body>
+ <canvas id="stars" aria-hidden="true"></canvas>
+ <main id="observatory" aria-label="The Moon, one discovery each day">
+  <h1 class="sr-only">Moon Feature of the Day</h1>
+  <div id="moon-stage">
+   <canvas id="moon" role="img" aria-label="The Moon with date-accurate lighting and orientation"></canvas>
+   <button id="feature-outline" class="feature-outline" hidden aria-label="Read about the daily lunar feature"><svg id="outline-svg" aria-hidden="true"><path id="outline-hit" class="outline-hit"/><path id="outline-trace" class="outline-trace"/></svg></button>
+  </div>
+  <button id="previous-day" class="day-nav previous" aria-label="Yesterday"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 5-7 7 7 7"/></svg><span id="previous-label">Yesterday</span></button>
+  <button id="next-day" class="day-nav next" aria-label="Tomorrow"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m10 5 7 7-7 7"/></svg><span id="next-label">Tomorrow</span></button>
+  <div id="loading" role="status">Bringing the Moon into focus…</div>
+  <div id="render-error" role="alert" hidden><p>The Moon couldn’t load.</p><button id="retry-render">Try again</button></div>
+  <div class="discovery-gutter" id="discovery-gutter">
+   <p id="observation-date" class="observation-date" aria-live="polite"></p>
+   <button id="feature-name" class="feature-name" aria-haspopup="dialog"></button>
+   <p id="no-feature" class="no-feature" hidden>No feature in view today.</p>
+   <button id="return-today" class="return-today" hidden>Back to today</button>
+  </div>
+ </main>
+ <noscript><section class="no-script"><h2>One lunar discovery each day</h2><p>Explore the Moon’s craters, seas, mountains, and valleys with a daily lesson and an interactive lunar atlas. Date-based sunlight and rotation reveal a changing view of the surface.</p><p>Enable JavaScript and WebGL to see the Moon and today’s feature. Surface maps come from NASA’s Lunar Reconnaissance Orbiter; feature outlines come from the USGS Gazetteer of Planetary Nomenclature.</p></section></noscript>
+ <dialog id="detail-dialog" aria-labelledby="detail-name">
+  <button id="close-detail" class="close-button" aria-label="Close feature details"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M6 18 18 6"/></svg></button>
+  <div class="detail-content">
+   <p id="detail-date" class="eyebrow"></p><h1 id="detail-name"></h1><p id="detail-subtitle" class="detail-subtitle"></p>
+   <p id="detail-intro" class="detail-intro"></p><p id="detail-lesson"></p>
+   <div class="observing-tip"><h2>Look a little closer</h2><p id="detail-tip"></p></div>
+   <p id="detail-visibility" class="detail-visibility"></p><p id="detail-coordinates" class="coordinates"></p>
+   <a id="detail-source" target="_blank" rel="noopener noreferrer">Explore the source</a>
+   <div class="credits"><a href="https://svs.gsfc.nasa.gov/4720/" target="_blank" rel="noopener noreferrer">NASA LRO surface imagery</a><span> · </span><a href="https://github.com/cosinekitty/astronomy" target="_blank" rel="noopener noreferrer">Astronomy Engine</a><p>Feature extent: <a id="outline-source" target="_blank" rel="noopener noreferrer">USGS Gazetteer</a> (approximate).</p><p>View from Earth · celestial north up. Display brightness adapts to the phase for comfortable study; phase and sunlight direction stay accurate. Stars are decorative; lunar eclipses are not simulated.</p></div>
+  </div>
+ </dialog>
+</body>
+</html>
