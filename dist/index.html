@@ -33,6 +33,7 @@
  <canvas id="stars" aria-hidden="true"></canvas>
  <main id="observatory" aria-label="The Moon, one discovery each day">
   <h1 class="sr-only">Moon Feature of the Day</h1>
+  <button id="return-today" class="return-today" hidden>Back to today</button>
   <div id="moon-stage">
    <canvas id="moon" role="img" aria-label="The Moon with date-accurate lighting and orientation"></canvas>
    <button id="feature-outline" class="feature-outline" hidden aria-label="Read about the daily lunar feature"><svg id="outline-svg" aria-hidden="true"><path id="outline-hit" class="outline-hit"/><path id="outline-trace" class="outline-trace"/></svg></button>
@@ -51,7 +52,7 @@
    <div class="about-wrap"><a id="about-link" href="#about-dialog" aria-haspopup="dialog" aria-describedby="about-tooltip">About</a>
     <div id="about-tooltip" role="tooltip" hidden><strong>Moon Feature of the Day</strong><span>Learn one lunar landmark each day, on a Moon that follows the date. Open About for controls and sources.</span></div>
    </div>
-   <div class="return-slot"><button id="return-today" class="return-today" hidden>Back to today</button></div>
+   <span class="footer-separator" aria-hidden="true">·</span>
    <a id="github-link" aria-disabled="true" title="The public GitHub repository is being prepared" target="_blank" rel="noopener noreferrer">GitHub</a>
   </footer>
  </main>
