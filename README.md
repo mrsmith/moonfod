@@ -11,6 +11,8 @@ npm run dev
 
 Open `http://127.0.0.1:4173`. This is a buildless static app; there are no runtime package installs or third-party network requests. All runtime assets are in `dist/`.
 
+The local preview disables browser caching so reloading picks up file edits. If switching from an older preview session, use a hard reload once to discard its previously cached files.
+
 ```sh
 npm test
 ```
