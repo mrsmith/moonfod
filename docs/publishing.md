@@ -1,94 +1,61 @@
-# Publish MoonFOD
+# Deployment
 
-## Current status
+MoonFOD is a static app. Its runtime files are in `dist/`; no database, backend service, or daily scheduled job is required. These instructions use Cloudflare Workers Static Assets.
 
-The app was deployed to [moonfod.com](https://moonfod.com) on November 22, 2026. The public [mrsmith/moonfod repository](https://github.com/mrsmith/moonfod) contains the source, MIT license, and GitHub Actions checks. The domain is registered and active in Cloudflare, and the `moonfod` Worker serves it as a custom domain. Alternate `workers.dev` and version-preview URLs are disabled. The original domain research is recorded in [the shortlist](domain-shortlist.md).
+## Prerequisites
 
-The application is the `dist/` directory. Cloudflare Workers Static Assets includes global caching and HTTPS. [Static asset requests are free and unlimited](https://developers.cloudflare.com/workers/static-assets/billing-and-limitations/); a separate CDN is unnecessary. The domain registration is a separate annual cost. All lunar calculations and daily lesson selection run in the visitor's browser, so there is no database, backend function, or midnight job to operate.
+- Node.js 22 or newer and npm.
+- A Cloudflare account with permission to deploy Workers.
+- An active domain zone in that account for custom-domain hosting.
 
-## 1. Check the local app
-
-Use Node 22 or newer. From the repository root:
+Install the pinned development tools from the repository root:
 
 ```sh
 npm ci
-npm test
-npm run check:deploy
-npm run dev
 ```
 
-Open `http://127.0.0.1:4173`. `check:deploy` uses `wrangler deploy --dry-run` and uploads nothing. The `build` script prepares metadata; it does not bundle the app or publish files.
+## Configure a fork
 
-## 2. Access the public GitHub repository
+The checked-in configuration targets the public MoonFOD project. For your own deployment, update `site.config.json`:
 
-The GitHub CLI is installed locally. Sign in with your own GitHub account:
+- `name`: the site name used in metadata.
+- `slug`: a unique Cloudflare Worker name.
+- `url`: your public HTTPS origin, used for canonical and social URLs.
+- `repositoryUrl`: your public source repository URL.
 
-```sh
-gh auth login --hostname github.com --git-protocol https --web
-gh auth status
+Set the matching domain in `wrangler.jsonc`, keeping the existing static-assets settings:
+
+```json
+"routes": [
+  {"pattern": "example.com", "custom_domain": true}
+]
 ```
 
-The repository already exists. On a new machine, clone it with:
+The domain must be active in the Cloudflare account you deploy to. Wrangler connects the custom domain, and Cloudflare manages its DNS records and HTTPS certificate. See [Cloudflare's custom-domain guide](https://developers.cloudflare.com/workers/configuration/routing/custom-domains/).
 
-```sh
-gh repo clone mrsmith/moonfod
-cd moonfod
-npm ci
-```
+The default configuration disables alternate `workers.dev` and version-preview addresses. Domain registration and renewal are separate from application deployment.
 
-The MIT license is included. `.gitignore` excludes login files, local hosting metadata, dependencies, and Wrangler state. GitHub Actions runs tests and a deployment dry run; it does not publish. No deployment secret is required for that workflow.
-
-## 3. Sign in to Cloudflare
-
-Wrangler is pinned in `package-lock.json`, so `npm ci` installs the tested version.
+## Authenticate
 
 ```sh
 npx wrangler login --use-keyring --scopes account:read user:read workers:write workers_scripts:write workers_routes:write zone:read
 npx wrangler whoami
 ```
 
-Approve the CLI access in your browser. The keyring option stores the login in the operating system's credential store. No API token belongs in source code or GitHub. If multiple Cloudflare accounts are available, select the account that should own the website and domain.
+Complete authorization in your browser. `--use-keyring` protects stored credentials with the operating system's credential store. If a localhost callback is unavailable, add `--device` to the login command.
 
-## 4. Domain configuration
+Credentials stay outside the repository. `.gitignore` excludes environment files and local Wrangler state. The GitHub validation workflow needs no deployment credentials.
 
-`moonfod.com` is registered in the same Cloudflare account as the Worker. Domain renewal is managed separately in Cloudflare Registrar; deploying the app does not register or renew the domain.
-
-The following custom-domain configuration in `wrangler.jsonc` connects it during deployment:
-
-```json
-"routes": [
-  {"pattern": "moonfod.com", "custom_domain": true}
-]
-```
-
-Keep the existing `assets` configuration. The CLI creates the Worker custom-domain route, with Cloudflare managing DNS and the HTTPS certificate. [Cloudflare's custom domain guide](https://developers.cloudflare.com/workers/configuration/routing/custom-domains/) explains the active-zone requirement.
-
-`site.config.json` holds the canonical address, brand, and Worker slug. If a different domain is chosen, update that file before publishing. Also update the package/repository name and documentation if the brand changes.
-
-## 5. Deploy updates
-
-This is the step that makes the app public:
+## Publish an update
 
 ```sh
-npm test
-npm run deploy
+npm test && npm run check:deploy && npm run deploy
 ```
 
-Wrangler prints the live URL. Open it and check the Moon, date arrows, feature outline, and lesson. Also check `/robots.txt`, `/sitemap.xml`, and `/assets/social-preview.jpg`.
+`check:deploy` uploads nothing. `deploy` generates metadata and uploads the app to the configured Cloudflare account and domain. New domains may need a short interval for HTTPS activation.
 
-The production configuration uses `workers_dev: false` and `preview_urls: false` so that `moonfod.com` is the single public address.
+Open the reported URL and check the Moon, date navigation, feature outlines, and lessons. Verify `/robots.txt`, `/sitemap.xml`, and `/assets/social-preview.jpg` after changes to site metadata.
 
-## Updating the site
+Commit and push your source changes separately. GitHub Actions validates commits but does not deploy them; a Git push alone does not update the live website.
 
-```sh
-npm test
-npm run check:deploy
-git add .
-git commit -m "Describe the update"
-git push
-npm run deploy
-```
-
-GitHub keeps the source history; Cloudflare serves the published files. A Git push alone does not deploy this project. Cloudflare's default ETags revalidate application files; larger image assets use a one-day browser cache.
-
-The app includes search descriptions, canonical and social tags, structured data, `robots.txt`, and a sitemap. Search indexing is not immediate or guaranteed. After launch, the sitemap can be submitted through a verified Google Search Console property; ownership verification must use the actual registered domain.
+Application files revalidate through Cloudflare's cache. Image assets have a one-day browser cache, so use a new filename when replacing an image that must update immediately.
