@@ -2,7 +2,7 @@
 
 ## Current status
 
-The public [mrsmith/moonfod repository](https://github.com/mrsmith/moonfod) contains the source, MIT license, and passing GitHub Actions checks. The Worker is configured for `https://moonfod.com`; domain registration and the first Cloudflare deployment are pending. Domain availability is recorded in [the shortlist](domain-shortlist.md).
+The app was deployed to [moonfod.com](https://moonfod.com) on November 22, 2026. The public [mrsmith/moonfod repository](https://github.com/mrsmith/moonfod) contains the source, MIT license, and GitHub Actions checks. The domain is registered and active in Cloudflare, and the `moonfod` Worker serves it as a custom domain. Alternate `workers.dev` and version-preview URLs are disabled. The original domain research is recorded in [the shortlist](domain-shortlist.md).
 
 The application is the `dist/` directory. Cloudflare Workers Static Assets includes global caching and HTTPS. [Static asset requests are free and unlimited](https://developers.cloudflare.com/workers/static-assets/billing-and-limitations/); a separate CDN is unnecessary. The domain registration is a separate annual cost. All lunar calculations and daily lesson selection run in the visitor's browser, so there is no database, backend function, or midnight job to operate.
 
@@ -49,11 +49,11 @@ npx wrangler whoami
 
 Approve the CLI access in your browser. The keyring option stores the login in the operating system's credential store. No API token belongs in source code or GitHub. If multiple Cloudflare accounts are available, select the account that should own the website and domain.
 
-## 4. Register and connect the domain
+## 4. Domain configuration
 
-Purchase the selected name through Cloudflare Registrar after confirming its current registration and renewal price. The registrar needs account contact and payment details. This setup does not purchase a domain automatically.
+`moonfod.com` is registered in the same Cloudflare account as the Worker. Domain renewal is managed separately in Cloudflare Registrar; deploying the app does not register or renew the domain.
 
-Once `moonfod.com` is active in that Cloudflare account, the following custom-domain configuration (already in `wrangler.jsonc`) connects it during deployment:
+The following custom-domain configuration in `wrangler.jsonc` connects it during deployment:
 
 ```json
 "routes": [
@@ -65,7 +65,7 @@ Keep the existing `assets` configuration. The CLI creates the Worker custom-doma
 
 `site.config.json` holds the canonical address, brand, and Worker slug. If a different domain is chosen, update that file before publishing. Also update the package/repository name and documentation if the brand changes.
 
-## 5. Publish — only when approved
+## 5. Deploy updates
 
 This is the step that makes the app public:
 
@@ -76,7 +76,7 @@ npm run deploy
 
 Wrangler prints the live URL. Open it and check the Moon, date arrows, feature outline, and lesson. Also check `/robots.txt`, `/sitemap.xml`, and `/assets/social-preview.jpg`.
 
-For an initial launch without a custom domain, leave `routes` absent and deploy to the free `workers.dev` address instead. After Wrangler reports that address, set it as `site.config.json`'s `url` and deploy again so canonical and social URLs match the live site. Switch back to the custom domain when it is connected. Once the custom domain works, `workers_dev` can be set to `false` to disable the alternate address.
+The production configuration uses `workers_dev: false` and `preview_urls: false` so that `moonfod.com` is the single public address.
 
 ## Updating the site
 
