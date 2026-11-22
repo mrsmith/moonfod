@@ -33,11 +33,10 @@
  <canvas id="stars" aria-hidden="true"></canvas>
  <main id="observatory" aria-label="The Moon, one discovery each day">
   <h1 class="sr-only">Moon Feature of the Day</h1>
-  <nav class="site-links" aria-label="About and source code">
+  <nav class="site-links" aria-label="About">
    <div class="about-wrap"><a id="about-link" href="#about-dialog" aria-haspopup="dialog" aria-describedby="about-tooltip">About</a>
     <div id="about-tooltip" role="tooltip" hidden><strong>Moon Feature of the Day</strong><span>Learn one lunar landmark each day, on a Moon that follows the date. Open About for controls and sources.</span></div>
    </div>
-   <a id="github-link" aria-disabled="true" title="The public GitHub repository is being prepared" target="_blank" rel="noopener noreferrer">GitHub</a>
   </nav>
   <div id="moon-stage">
    <canvas id="moon" role="img" aria-label="The Moon with date-accurate lighting and orientation"></canvas>
@@ -80,6 +79,7 @@
    <h2>Grounded in real data</h2>
    <p>The Moon’s phase, sunlight direction, and rotation follow the date. The view is Earth-facing with celestial north up. Brightness is enhanced to make night-side terrain readable; stars are decorative and lunar eclipses aren’t simulated.</p>
    <div class="credits"><p>Surface imagery: <a href="https://svs.gsfc.nasa.gov/4720/" target="_blank" rel="noopener noreferrer">NASA / GSFC / ASU / LROC</a>. Elevation: NASA / GSFC / LOLA. Approximate feature outlines: <a href="https://planetarynames.wr.usgs.gov/" target="_blank" rel="noopener noreferrer">IAU / USGS Gazetteer</a>. Calculations: <a href="https://github.com/cosinekitty/astronomy" target="_blank" rel="noopener noreferrer">Astronomy Engine</a>.</p><p>Original code and lesson text are MIT licensed. No account, analytics, or location permission is needed.</p></div>
+   <a id="github-link" aria-disabled="true" title="The public GitHub repository is being prepared" target="_blank" rel="noopener noreferrer">View source on GitHub</a>
   </div>
  </dialog>
 </body>
