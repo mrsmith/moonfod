@@ -12,6 +12,7 @@ let selectedFeature=false,hoveredFeature=false,focusedFeature=false;
 const dialogs=()=>document.querySelector('dialog[open]');
 const view={zoom:1,south:false,brightness:40};
 const formatDate=d=>new Intl.DateTimeFormat(undefined,{day:'numeric',month:'long',...(d.getFullYear()!==new Date().getFullYear()?{year:'numeric'}:{})}).format(d);
+const titleDateFormat=new Intl.DateTimeFormat(undefined,{day:'numeric',month:'long',year:'numeric'});
 const coord=(v,p,n)=>`${Math.abs(v).toFixed(1)}° ${v>=0?p:n}`;
 function relativeDay(date){const diff=dayNumber(date)-dayNumber(new Date());return diff===0?'Today':diff===-1?'Yesterday':diff===1?'Tomorrow':formatDate(date)}
 function adjacent(direction){const d=new Date(selectedDate);d.setDate(d.getDate()+direction);return d}
@@ -35,7 +36,7 @@ function updateDate(date,{isLive=false}={}){
  $('next-day').setAttribute('aria-label',`View ${relativeDay(adjacent(1)).toLowerCase()}`);
  $('previous-day').disabled=dayKey(date)==='1900-01-01';$('next-day').disabled=dayKey(date)==='2100-12-31';
  $('moon').setAttribute('aria-label',`${phaseName(e)}, ${(e.illuminated*100).toFixed(1)} percent illuminated. ${formatDate(date)}. View from Earth, celestial north up.`);
- document.title=`Moon Feature of the Day — ${site.name}${diff===0?'':` · ${relative}`}`;
+ document.title=`Moon Feature of the Day * ${titleDateFormat.format(date)}`;
  scheduleDraw();
 }
 function scheduleDraw(){if(pendingDraw||document.hidden)return;pendingDraw=requestAnimationFrame(()=>{pendingDraw=0;draw()})}
