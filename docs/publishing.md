@@ -2,7 +2,7 @@
 
 ## Current status
 
-Prepared locally only. No GitHub repository has been pushed, no Cloudflare deployment has been made, and no domain has been purchased. The intended repository and Worker name are `moonfod`, with `https://moonfod.com` as the planned public address. Domain availability is recorded in [the shortlist](domain-shortlist.md).
+The public [mrsmith/moonfod repository](https://github.com/mrsmith/moonfod) contains the source, MIT license, and passing GitHub Actions checks. The Worker is configured for `https://moonfod.com`; domain registration and the first Cloudflare deployment are pending. Domain availability is recorded in [the shortlist](domain-shortlist.md).
 
 The application is the `dist/` directory. Cloudflare Workers Static Assets includes global caching and HTTPS. [Static asset requests are free and unlimited](https://developers.cloudflare.com/workers/static-assets/billing-and-limitations/); a separate CDN is unnecessary. The domain registration is a separate annual cost. All lunar calculations and daily lesson selection run in the visitor's browser, so there is no database, backend function, or midnight job to operate.
 
@@ -19,7 +19,7 @@ npm run dev
 
 Open `http://127.0.0.1:4173`. `check:deploy` uses `wrangler deploy --dry-run` and uploads nothing. The `build` script prepares metadata; it does not bundle the app or publish files.
 
-## 2. Create the public GitHub repository when ready
+## 2. Access the public GitHub repository
 
 The GitHub CLI is installed locally. Sign in with your own GitHub account:
 
@@ -28,15 +28,12 @@ gh auth login --hostname github.com --git-protocol https --web
 gh auth status
 ```
 
-Review the staged files and commit them using the identity you want to appear publicly. If this directory is not yet a Git repository, initialize it with `git init -b main` first.
+The repository already exists. On a new machine, clone it with:
 
 ```sh
-git add .
-git diff --cached --stat
-git commit -m "Prepare MoonFOD lunar atlas"
-gh repo create moonfod --public --source=. --remote=origin --push \
-  --description "Moon Feature of the Day — one lunar discovery each day" \
-  --homepage https://moonfod.com
+gh repo clone mrsmith/moonfod
+cd moonfod
+npm ci
 ```
 
 The MIT license is included. `.gitignore` excludes login files, local hosting metadata, dependencies, and Wrangler state. GitHub Actions runs tests and a deployment dry run; it does not publish. No deployment secret is required for that workflow.
@@ -56,7 +53,7 @@ Approve the CLI access in your browser. The keyring option stores the login in t
 
 Purchase the selected name through Cloudflare Registrar after confirming its current registration and renewal price. The registrar needs account contact and payment details. This setup does not purchase a domain automatically.
 
-Once `moonfod.com` is active in that Cloudflare account, add the following top-level property to `wrangler.jsonc`:
+Once `moonfod.com` is active in that Cloudflare account, the following custom-domain configuration (already in `wrangler.jsonc`) connects it during deployment:
 
 ```json
 "routes": [

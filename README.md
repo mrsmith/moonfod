@@ -49,7 +49,7 @@ Independent comparison data in `tests/nasa-reference.json` is sampled from NASA'
 
 ## Publishing
 
-Prepared locally for **moonfod.com**; the domain has not been registered and the app has not been published. The repository name and Cloudflare Worker name are **moonfod**.
+Source is public at [mrsmith/moonfod](https://github.com/mrsmith/moonfod). The app is configured for **moonfod.com**; domain registration and the first Cloudflare deployment are pending. The Cloudflare Worker name is **moonfod**.
 
 Cloudflare Workers Static Assets serves the app with its global CDN and HTTPS. No separate CDN, server, database, or daily scheduled job is needed. No analytics is used. See [the publishing guide](docs/publishing.md) for the exact CLI steps.
 
