@@ -24,7 +24,7 @@ function updateDate(date,{isLive=false}={}){
  if(featured&&!isObservable(featured,e))featured=null;
  if(previousDiscovery!==`${dayKey(date)}:${featured?.id}`){hoveredFeature=false;focusedFeature=false;setFeatureSelected(false)}
  const relative=relativeDay(date),diff=dayNumber(date)-dayNumber(new Date());
- $('observation-date').textContent=diff===0?'Today’s feature':diff>0?(diff===1?'Tomorrow’s Moon':`Moon at ${formatDate(date)}`):`Feature for ${formatDate(date)}`;
+ $('observation-date').textContent=diff===0?'Today’s feature':diff>0?(diff===1?'Tomorrow’s Moon':`Moon on ${formatDate(date)}`):`Feature for ${formatDate(date)}`;
  $('observation-date').title=diff===0?`Moon Feature of the Day · ${formatDate(date)}`:`Moon Feature of the Day · ${relative}`;
  $('feature-name').hidden=!featured;$('feature-name').textContent=featured?.name||'';
  updateFeatureLabel();

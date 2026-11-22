@@ -19,7 +19,7 @@ npm test
 
 ## Experience
 
-The Moon fills the view against a subtle star field. Side arrows move one day at a time; swipe left across the Moon for the next day and right for the previous day. Today follows the clock; past and future dates use 21:00 in the browser's local timezone. The caption reads “Today’s feature” or “Feature for [date]”; future dates say “Tomorrow’s Moon” or “Moon at [date]” and reveal no lesson.
+The Moon fills the view against a subtle star field. Side arrows move one day at a time; swipe left across the Moon for the next day and right for the previous day. Today follows the clock; past and future dates use 21:00 in the browser's local timezone. The caption reads “Today’s feature” or “Feature for [date]”; future dates say “Tomorrow’s Moon” or “Moon on [date]” and reveal no lesson.
 
 On touchscreens, tap the Moon, feature, or feature name to highlight the outline, then tap the highlighted feature or its name again to read the lesson. The two taps need not be rapid. Mouse hover and keyboard focus highlight the feature, with one click or Enter opening the lesson. Outlines are faint grey by default and brighten to gold, without filling or obscuring the terrain. The invisible hit area includes the feature interior and a wider boundary. Swipes ignore vertical movement, small drags, long holds, pinches, and pointer cancellation; a completed swipe cannot also click a lesson.
 
